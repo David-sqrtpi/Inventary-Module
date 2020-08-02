@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SD Android</string>
+    <string name="button">Cógigo escaneado</string>
+    <string name="txt">hint</string>
 </resources>
