@@ -3,7 +3,10 @@ package com.sdandroid;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -15,7 +18,7 @@ import com.google.zxing.integration.android.IntentResult;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText etCode;
+    EditText etCode, etNombre, etPrecio;
     Button btnEscanner;
 
     @Override
@@ -25,25 +28,19 @@ public class MainActivity extends AppCompatActivity {
 
         etCode = findViewById(R.id.codigo);
         btnEscanner = findViewById(R.id.button);
+        etNombre = findViewById(R.id.etNombre);
+        etPrecio = findViewById(R.id.etPrecio);
 
-        btnEscanner.setOnClickListener(new View.OnClickListener(){
 
-            public void onClick(View v){
-
-                Escanear();
-
-            }
-
-        });
 
     }
 
-    public void Escanear(){
+    public void Escanear(View view){
 
         IntentIntegrator intent = new IntentIntegrator(this);
         intent.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
 
-        intent.setPrompt("Escanear Código");
+        intent.setPrompt("Apunte al código de barras");
         intent.setCameraId(0);
         intent.setBeepEnabled(false);
         intent.setBarcodeImageEnabled(false);
@@ -65,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
             else{
 
-                etCode.setText(result.getContents().toString());
+                etCode.setText(result.getContents());
 
             }
 
@@ -76,6 +73,124 @@ public class MainActivity extends AppCompatActivity {
             super.onActivityResult(requestCode, resultCode, data);
 
         }
+
+    }
+
+    public void consulta(View vista) {
+
+        AdminSQLite admin = new AdminSQLite(this, "administracion", null, 1);
+        SQLiteDatabase db = admin.getWritableDatabase();
+
+        String barCode = etCode.getText().toString();
+
+        //name = etNombre.getText().toString();
+        //price = etNombre.getText().toString();
+
+        Cursor fila = db.rawQuery("SELECT nombre, precio FROM producto WHERE code="+barCode, null);
+
+        if (fila.moveToFirst()) {
+
+            etNombre.setText(fila.getString(0));
+            etPrecio.setText(fila.getString(1));
+
+        }
+        else {
+
+            Toast.makeText(this, "El producto no esta registrado", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Escriba nombre y precio en los campos para registrar", Toast.LENGTH_LONG).show();
+
+        }
+
+    }
+
+    public void registrar(View view){
+
+        AdminSQLite admin = new AdminSQLite(this, "administracion", null, 1);
+        SQLiteDatabase db = admin.getWritableDatabase();
+
+        String code = etCode.getText().toString();
+        String nombre = etNombre.getText().toString();
+        String precio = etPrecio.getText().toString();
+
+        ContentValues registro = new ContentValues();
+        registro.put("code", code);
+        registro.put("nombre", nombre);
+        registro.put("precio", precio);
+
+        db.insert("producto", null, registro);
+
+        db.close();
+
+        etPrecio.setText("");
+        etCode.setText("");
+        etNombre.setText("");
+
+        Toast.makeText(this, "Se ha añadido el producto", Toast.LENGTH_LONG).show();
+
+    }
+
+    public void borrar() {
+
+        AdminSQLite admin = new AdminSQLite(this, "administracion", null, 1);
+        SQLiteDatabase db = admin.getWritableDatabase();
+
+        String codigo = etCode.getText().toString();
+
+        int cant = db.delete("usuarios", "code=" + codigo, null);
+
+        db.close();
+
+        etPrecio.setText("");
+        etCode.setText("");
+        etNombre.setText("");
+
+        if(cant == 1){
+
+            Toast.makeText(this, "Se ha eliminado el registro", Toast.LENGTH_LONG).show();
+
+        }
+        else{
+
+            Toast.makeText(this, "El registro no existe", Toast.LENGTH_LONG).show();
+
+        }
+
+    }
+
+    public void editar(){
+
+        AdminSQLite admin = new AdminSQLite(this, "administracion", null, 1);
+        SQLiteDatabase db = admin.getWritableDatabase();
+
+        String codigo = etCode.getText().toString();
+        String nombre = etNombre.getText().toString();
+        String precio = etPrecio.getText().toString();
+
+        ContentValues registro = new ContentValues();
+
+        registro.put("code", codigo);
+        registro.put("nombre", nombre);
+        registro.put("precio", precio);
+
+        int cant = db.update("producto", registro, "code=" + codigo, null);
+
+        db.close();
+
+        etPrecio.setText("");
+        etCode.setText("");
+        etNombre.setText("");
+
+        if(cant == 1){
+
+            Toast.makeText(this, "Se ha modificado el producto", Toast.LENGTH_LONG).show();
+        }
+        else{
+
+            Toast.makeText(this, "El registro no existe", Toast.LENGTH_LONG).show();
+
+        }
+
+
 
     }
 

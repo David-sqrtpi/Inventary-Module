@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">SD Android</string>
-    <string name="button">Cógigo escaneado</string>
-    <string name="txt">hint</string>
+    <string name="button">Buscar</string>
+    <string name="button2">Registrar</string>
+    <string name="txt">Codigo</string>
+    <string name="txt2">Nombre</string>
+    <string name="txt3">Precio</string>
 </resources>
