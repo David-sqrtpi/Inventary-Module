@@ -5,4 +5,6 @@
     <string name="txt">Codigo</string>
     <string name="txt2">Nombre</string>
     <string name="txt3">Precio</string>
+    <string name="button3">Borrar</string>
+    <string name="button4">Actualizar</string>
 </resources>
