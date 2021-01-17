@@ -2,14 +2,20 @@ package com.sdandroid;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -19,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     EditText etCode, etNombre, etPrecio;
     Button btnEscanner, btnBorrar, btnUpdate;
+
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,31 +81,47 @@ public class MainActivity extends AppCompatActivity {
 
     public void registrar(View view) {
 
-        String code = etCode.getText().toString();
-        String name = etNombre.getText().toString();
-        String price = etPrecio.getText().toString();
+        final String code = etCode.getText().toString();
+        final String name = etNombre.getText().toString();
+        final String price = etPrecio.getText().toString();
 
+        db.collection("product")
+                .document(code)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if(document.exists()){
+                                Toast.makeText(MainActivity.this, "El registro ya existe", Toast.LENGTH_LONG).show();
+                            } else {
+                                if (!code.equals("") && !name.equals("") && !price.equals("")) {
 
-        if (!code.equals("") && !name.equals("") && !price.equals("")) {
+                                    Product product = new Product();
+                                    product.setName(name);
+                                    product.setPrice(price);
 
-            Product product = new Product();
-            product.setCode(code);
-            product.setName(name);
-            product.setPrice(price);
+                                    CloudFirestore cloudFirestore = new CloudFirestore();
 
-            CloudFirestore cloudFirestore = new CloudFirestore();
+                                    cloudFirestore.create(code, product);
 
-            cloudFirestore.create(code, product);
+                                    etPrecio.setText("");
+                                    etCode.setText("");
+                                    etNombre.setText("");
 
-            etPrecio.setText("");
-            etCode.setText("");
-            etNombre.setText("");
+                                    Toast.makeText(MainActivity.this, "Se ha registrado el producto", Toast.LENGTH_LONG).show();
 
-            Toast.makeText(MainActivity.this, "Se ha registrado el producto", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Los campos son obligatorios", Toast.LENGTH_LONG).show();
+                                }
+                            }
 
-        } else {
-            Toast.makeText(MainActivity.this, "Los campos son obligatorios", Toast.LENGTH_LONG).show();
-        }
+                        } else {
+                            Log.d("TAG", "Failed with: ", task.getException());
+                        }
+                    }
+                });
 
     }
 
@@ -107,20 +131,27 @@ public class MainActivity extends AppCompatActivity {
 
         if (!code.equals("")) {
 
-            CloudFirestore cloudFirestore = new CloudFirestore();
-
-            if(cloudFirestore.exists(code)){
-
-                Product product = cloudFirestore.get(code);
-
-                etPrecio.setText(product.getPrice());
-                etNombre.setText(product.getName());
-
-            } else {
-
-                Toast.makeText(MainActivity.this, "El registro no existe", Toast.LENGTH_LONG).show();
-
-            }
+            db.collection("product")
+                    .document(code)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if(document.exists()){
+                                    String name = document.getString("name");
+                                    String price = document.getString("price");
+                                    etPrecio.setText(price);
+                                    etNombre.setText(name);
+                                } else {
+                                    Toast.makeText(MainActivity.this, "El registro no existe", Toast.LENGTH_LONG).show();
+                                }
+                            } else {
+                                Log.d("TAG", "Failed with: ", task.getException());
+                            }
+                        }
+                    });
 
         } else {
             Toast.makeText(this, "El campo código no puede estar vacío", Toast.LENGTH_LONG).show();

@@ -20,7 +20,7 @@ public class CloudFirestore implements Database {
     private Product product = new Product();
 
     @Override
-    public Product get(String id) throws InterruptedException {
+    public Product get(String id) {
 
 
         db.collection("product")
@@ -34,16 +34,12 @@ public class CloudFirestore implements Database {
                             String code = documentSnapshot.getString("code");
                             String name = documentSnapshot.getString("name");
                             String price = documentSnapshot.getString("price");
-                            System.out.println("********************************************");
-                            System.out.println("Nombre: " + name + ", Precio: " + price + ".");
-                            System.out.println("********************************************");
                             product.setCode(code);
                             product.setName(name);
                             product.setPrice(price);
-                            product.setName("Hola");
                         }
                     }
-                }).wait();
+                });
 
         return product;
 
@@ -64,10 +60,10 @@ public class CloudFirestore implements Database {
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("name", product.getName());
-        payload.put("code", product.getCode());
+        payload.put("code", id);
         payload.put("price", product.getPrice());
 
-        db.collection("product").document(product.getCode()).set(product);
+        db.collection("product").document(id).set(product);
 
     }
 
