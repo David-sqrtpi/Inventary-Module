@@ -5,6 +5,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,7 +23,6 @@ public class CloudFirestore implements Database {
 
     @Override
     public Product get(String id) {
-
 
         db.collection("product")
                 .document(id)
@@ -46,7 +47,9 @@ public class CloudFirestore implements Database {
     }
 
     @Override
-    public void delete() {
+    public void delete(String id) {
+
+        db.collection("product").document(id).delete();
 
     }
 
@@ -57,11 +60,6 @@ public class CloudFirestore implements Database {
 
     @Override
     public void create(String id, Product product) {
-
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("name", product.getName());
-        payload.put("code", id);
-        payload.put("price", product.getPrice());
 
         db.collection("product").document(id).set(product);
 

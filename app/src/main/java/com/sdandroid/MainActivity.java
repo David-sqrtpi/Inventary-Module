@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (!code.equals("") && !name.equals("") && !price.equals("")) {
 
                                     Product product = new Product();
+                                    product.setCode(code);
                                     product.setName(name);
                                     product.setPrice(price);
 
@@ -158,32 +159,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*public void borrar(View view) {
+    public void borrar(View view) {
 
-        String codigo = etCode.getText().toString();
+        String code = etCode.getText().toString();
 
-        final String TAG = "";
-
-        if (!codigo.equals("")) {
-            db.collection("productos").whereEqualTo("código", codigo).
-                    .delete()
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                            Toast.makeText(MainActivity.this, "Registro borrado", Toast.LENGTH_LONG).show();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error deleting document", e);
-                            Toast.makeText(MainActivity.this, "No se puede borrar el registro", Toast.LENGTH_LONG).show();
-                        }
-                    });
-        } else {
+        if(code.equals("")){
             Toast.makeText(MainActivity.this, "El campo código no puede estar vacío", Toast.LENGTH_LONG).show();
+        } else {
+            CloudFirestore cloudFirestore = new CloudFirestore();
+
+            cloudFirestore.delete(code);
+
+            Toast.makeText(MainActivity.this, "Se ha borrado el registro", Toast.LENGTH_LONG).show();
         }
 
         etPrecio.setText("");
@@ -192,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void editar(View view) {
+    /*public void editar(View view) {
 
         String codigo = etCode.getText().toString();
 

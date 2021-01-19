@@ -6,7 +6,7 @@ public interface Database {
 
     Product get(String id) throws InterruptedException;
 
-    void delete();
+    void delete(String id);
 
     void update();
 
