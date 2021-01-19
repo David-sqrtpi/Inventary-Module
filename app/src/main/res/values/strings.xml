@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SD Android</string>
+    <string name="app_name">Inventary Module</string>
     <string name="button">Buscar</string>
     <string name="button2">Registrar</string>
     <string name="txt">Codigo</string>
