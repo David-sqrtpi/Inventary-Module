@@ -179,47 +179,45 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /*public void editar(View view) {
+    public void editar(View view) {
 
-        String codigo = etCode.getText().toString();
+        final String code = etCode.getText().toString();
 
-        db.collection("productos")
-                .whereEqualTo("codigo", codigo)
+        db.collection("product")
+                .document(code)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                if (document.exists()) {
-                                    String codigo = etCode.getText().toString();
-                                    String nombre = etNombre.getText().toString();
-                                    String precio = etPrecio.getText().toString();
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            if (documentSnapshot.exists()){
 
-                                    Map<String, Object> data = new HashMap<>();
-                                    data.put("descripción", nombre);
-                                    data.put("precio", precio);
+                                CloudFirestore cloudFirestore = new CloudFirestore();
 
-                                    db.collection("productos").document(codigo)
-                                            .set(data, SetOptions.merge());
+                                Product product = new Product();
 
-                                    etPrecio.setText("");
-                                    etCode.setText("");
-                                    etNombre.setText("");
-
-                                    Toast.makeText(MainActivity.this, "Se ha editado", Toast.LENGTH_LONG).show();
-
+                                if (!product.getName().equals("")) {
+                                    product.setName(etNombre.getText().toString());
                                 } else {
-                                    Toast.makeText(MainActivity.this, "El registro no existe", Toast.LENGTH_LONG).show();
+                                    product.setName(documentSnapshot.getString("name"));
                                 }
 
+                                if (!product.getPrice().equals("")) {
+                                    product.setPrice(etPrecio.getText().toString());
+                                } else {
+                                    product.setName(documentSnapshot.getString("price"));
+                                }
+
+                                cloudFirestore.update(code, product);
+
+                            } else {
+                                Toast.makeText(MainActivity.this, "El registro no existe. No se puede actualizar", Toast.LENGTH_LONG).show();
                             }
-                        } else {
-                            Toast.makeText(MainActivity.this, "Error inesperado", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
 
-    }*/
+    }
 
 }

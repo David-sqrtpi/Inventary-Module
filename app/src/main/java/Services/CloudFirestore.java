@@ -5,15 +5,11 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.sdandroid.Product;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class CloudFirestore implements Database {
 
@@ -54,8 +50,13 @@ public class CloudFirestore implements Database {
     }
 
     @Override
-    public void update() {
+    public void
+    update(String id, Product product) {
 
+        product.setCode(id);
+
+        db.collection("product").document(id)
+                .set(product, SetOptions.merge());
     }
 
     @Override

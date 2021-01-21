@@ -8,7 +8,7 @@ public interface Database {
 
     void delete(String id);
 
-    void update();
+    void update(String id, Product product);
 
     void create(String id, Product payload);
 
