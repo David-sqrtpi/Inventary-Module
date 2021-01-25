@@ -20,6 +20,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import Services.Callback;
+import Services.CloudFirestore;
+
 public class Consult extends AppCompatActivity {
 
     private EditText editText;
@@ -92,7 +95,7 @@ public class Consult extends AppCompatActivity {
 
         if (!code.equals("")) {
 
-            db.collection("product")
+            /*db.collection("product")
                     .document(code)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -116,7 +119,20 @@ public class Consult extends AppCompatActivity {
                                 Log.d("TAG", "Failed with: ", task.getException());
                             }
                         }
-                    });
+                    });*/
+
+            final CloudFirestore cloudFirestore = new CloudFirestore();
+
+            cloudFirestore.exists(code, new Callback() {
+                @Override
+                public void responseCallback(boolean result) {
+                    if(!result){
+                        Toast.makeText(Consult.this, "El registro no existe", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(Consult.this, "El registro existe", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
 
         } else {
             Toast.makeText(this, "El campo código no puede estar vacío", Toast.LENGTH_LONG).show();

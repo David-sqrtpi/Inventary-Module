@@ -13,14 +13,14 @@ import Entity.Product;
 
 public class CloudFirestore implements Database {
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseIntegration firebaseIntegration = new FirebaseIntegration();
     private boolean exists = true;
     private Product product = new Product();
 
     @Override
     public Product get(String id) {
 
-        db.collection("product")
+        firebaseIntegration.db.collection("product")
                 .document(id)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -45,7 +45,7 @@ public class CloudFirestore implements Database {
     @Override
     public void delete(String id) {
 
-        db.collection("product").document(id).delete();
+        firebaseIntegration.db.collection("product").document(id).delete();
 
     }
 
@@ -55,20 +55,20 @@ public class CloudFirestore implements Database {
 
         product.setCode(id);
 
-        db.collection("product").document(id)
+        firebaseIntegration.db.collection("product").document(id)
                 .set(product, SetOptions.merge());
     }
 
     @Override
     public void create(String id, Product product) {
 
-        db.collection("product").document(id).set(product);
+        firebaseIntegration.db.collection("product").document(id).set(product);
 
     }
 
-    public boolean exists(String id) {
+    public void exists(String id, final Callback callback) {
 
-        db.collection("product")
+        firebaseIntegration.db.collection("product")
                 .document(id)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -77,13 +77,12 @@ public class CloudFirestore implements Database {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             exists = document.exists();
+                            callback.responseCallback(exists);
                         } else {
                             Log.d("TAG", "Failed with: ", task.getException());
                         }
                     }
                 });
-
-        return exists;
 
     }
 }
