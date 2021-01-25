@@ -4,12 +4,12 @@ import Entity.Product;
 
 public interface Database {
 
-    Product get(String id) throws InterruptedException;
+    void get(String id, final ProductCallback productCallback) throws InterruptedException;
 
     void delete(String id);
 
-    void update(String id, Product product);
+    void update(Product product);
 
-    void create(String id, Product payload);
+    void create(Product product);
 
 }

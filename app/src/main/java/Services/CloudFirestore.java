@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import Entity.Product;
 
@@ -18,7 +17,7 @@ public class CloudFirestore implements Database {
     private Product product = new Product();
 
     @Override
-    public Product get(String id) {
+    public void get(String id, final ProductCallback productCallback) {
 
         firebaseIntegration.db.collection("product")
                 .document(id)
@@ -34,11 +33,12 @@ public class CloudFirestore implements Database {
                             product.setCode(code);
                             product.setName(name);
                             product.setPrice(price);
+
+                            productCallback.responseCallback(product);
+
                         }
                     }
                 });
-
-        return product;
 
     }
 
@@ -51,22 +51,22 @@ public class CloudFirestore implements Database {
 
     @Override
     public void
-    update(String id, Product product) {
+    update(Product product) {
 
-        product.setCode(id);
+        product.setCode(product.getCode());
 
-        firebaseIntegration.db.collection("product").document(id)
+        firebaseIntegration.db.collection("product").document(product.getCode())
                 .set(product, SetOptions.merge());
     }
 
     @Override
-    public void create(String id, Product product) {
+    public void create(Product product) {
 
-        firebaseIntegration.db.collection("product").document(id).set(product);
+        firebaseIntegration.db.collection("product").document(product.getCode()).set(product);
 
     }
 
-    public void exists(String id, final Callback callback) {
+    public void exists(String id, final BooleanCallback booleanCallback) {
 
         firebaseIntegration.db.collection("product")
                 .document(id)
@@ -77,7 +77,7 @@ public class CloudFirestore implements Database {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             exists = document.exists();
-                            callback.responseCallback(exists);
+                            booleanCallback.responseCallback(exists);
                         } else {
                             Log.d("TAG", "Failed with: ", task.getException());
                         }
@@ -85,4 +85,5 @@ public class CloudFirestore implements Database {
                 });
 
     }
+
 }

@@ -1,5 +1,7 @@
 package Services;
 
-public interface Callback {
+public interface BooleanCallback {
+
     void responseCallback(boolean result);
+
 }

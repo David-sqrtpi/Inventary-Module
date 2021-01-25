@@ -1,27 +1,24 @@
 package com.sdandroid;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import Services.Callback;
+import Entity.Product;
+import Services.BooleanCallback;
 import Services.CloudFirestore;
+import Services.ProductCallback;
 
 public class Consult extends AppCompatActivity {
 
@@ -95,43 +92,28 @@ public class Consult extends AppCompatActivity {
 
         if (!code.equals("")) {
 
-            /*db.collection("product")
-                    .document(code)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if(document.exists()){
-                                    String name = document.getString("name");
-                                    String price = document.getString("price");
-                                    textViewId.setText("id: " + code);
-                                    textViewPrice.setText("Precio: " + price);
-                                    textViewName.setText("Nombre: " + name);
-                                } else {
-                                    Toast.makeText(Consult.this, "El registro no existe", Toast.LENGTH_LONG).show();
-                                    textViewId.setText("Registro con codigo " + code + " no encontrado");
-                                    textViewPrice.setText("");
-                                    textViewName.setText("");
-                                }
-                            } else {
-                                Log.d("TAG", "Failed with: ", task.getException());
-                            }
-                        }
-                    });*/
-
             final CloudFirestore cloudFirestore = new CloudFirestore();
 
-            cloudFirestore.exists(code, new Callback() {
+            cloudFirestore.exists(code, new BooleanCallback() {
                 @Override
                 public void responseCallback(boolean result) {
                     if(!result){
                         Toast.makeText(Consult.this, "El registro no existe", Toast.LENGTH_LONG).show();
+                        textViewId.setText("Registro con codigo " + code + " no encontrado");
+                        textViewPrice.setText("");
+                        textViewName.setText("");
                     } else {
-                        Toast.makeText(Consult.this, "El registro existe", Toast.LENGTH_LONG).show();
+                        cloudFirestore.get(code, new ProductCallback() {
+                            @Override
+                            public void responseCallback(Product product) {
+                                textViewId.setText("id: " + product.getCode());
+                                textViewPrice.setText("Precio: " + product.getPrice());
+                                textViewName.setText("Nombre: " + product.getName());
+                            }
+                        });
                     }
                 }
+
             });
 
         } else {
