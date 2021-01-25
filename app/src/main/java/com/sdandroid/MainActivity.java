@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import Entity.Product;
 import Services.CloudFirestore;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,50 +34,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        etCode = findViewById(R.id.codigo);
-        btnEscanner = findViewById(R.id.button);
-        etNombre = findViewById(R.id.etNombre);
-        etPrecio = findViewById(R.id.etPrecio);
-        btnBorrar = findViewById(R.id.BorrarBtn);
-        btnUpdate = findViewById(R.id.updateBtn);
-    }
-
-    public void scan(View view){
-
-        IntentIntegrator intent = new IntentIntegrator(this);
-        intent.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-
-        intent.setPrompt("Apunte al código de barras");
-        intent.setCameraId(0);
-        intent.setBeepEnabled(false);
-        intent.setBarcodeImageEnabled(false);
-        intent.setOrientationLocked(false);
-        intent.initiateScan();
-
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-
-        if (result != null) {
-
-            if (result.getContents() == null) {
-
-                Toast.makeText(this, "Escaneo Cancelado", Toast.LENGTH_LONG).show();
-
-            } else {
-
-                etCode.setText(result.getContents());
-
-            }
-
-        } else {
-
-            super.onActivityResult(requestCode, resultCode, data);
-
-        }
-
+        //etCode = findViewById(R.id.codigo);
+        //btnEscanner = findViewById(R.id.button);
+        //etNombre = findViewById(R.id.etNombre);
+        //etPrecio = findViewById(R.id.etPrecio);
+        //btnBorrar = findViewById(R.id.BorrarBtn);
+        //btnUpdate = findViewById(R.id.updateBtn);
     }
 
     public void registrar(View view) {
@@ -218,6 +181,21 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    public void newActivity(View view) {
+        Intent intent = new Intent(this, Result.class);
+        startActivity(intent);
+    }
+
+    public void consult(View view) {
+        Intent intent = new Intent(this, Consult.class);
+        startActivity(intent);
+    }
+
+    public void cart(View view) {
+         Intent intent = new Intent(this, Cart.class);
+         startActivity(intent);
     }
 
 }

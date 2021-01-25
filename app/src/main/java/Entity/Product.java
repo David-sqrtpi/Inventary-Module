@@ -1,4 +1,4 @@
-package com.sdandroid;
+package Entity;
 
 public class Product {
 

@@ -1,6 +1,6 @@
 package Services;
 
-import com.sdandroid.Product;
+import Entity.Product;
 
 public interface Database {
 
